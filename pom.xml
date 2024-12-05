@@ -1,0 +1,286 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  - Cornelius IDC Red
+ -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- ====== Basics =============================================================== -->
+
+    <groupId>com.pivotbits.kos.sample</groupId>
+    <artifactId>directory-to-kab</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+    <name>kos-sample</name>
+
+    <!-- ====== Properties =========================================================== -->
+
+    <properties>
+        <!-- Core Properties -->
+        <kos.version>0.0.0-SNAPSHOT</kos.version>
+        <kos-maven-plugin.version>1.0.9-SNAPSHOT</kos-maven-plugin.version>
+        <java.version>17</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <hamcrest.version>2.2</hamcrest.version>
+        <lombok.version>1.18.28</lombok.version>
+        <junit-jupiter.version>5.9.3</junit-jupiter.version>
+
+        <!-- Maven Plugin Versions (last updated 2023-05-17 by RS) -->
+        <!-- https://maven.apache.org/plugins/index.html -->
+         <!-- https://maven.apache.org/plugins/maven-clean-plugin/ -->
+        <maven-clean-plugin.version>3.2.0</maven-clean-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-compiler-plugin/ -->
+        <maven-compiler-plugin.version>3.11.0</maven-compiler-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-dependency-plugin/ -->
+        <maven-dependency-plugin.version>3.5.0</maven-dependency-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-deploy-plugin/ -->
+        <maven-deploy-plugin.version>3.1.1</maven-deploy-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-jar-plugin/ -->
+        <maven-jar-plugin.version>3.3.0</maven-jar-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-javadoc-plugin/ -->
+        <maven-javadoc-plugin.version>3.5.0</maven-javadoc-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-resources-plugin/ -->
+        <maven-resources-plugin.version>3.3.1</maven-resources-plugin.version>
+        <!-- https://maven.apache.org/plugins/maven-shade-plugin/ -->
+        <maven-shade-plugin.version>3.4.1</maven-shade-plugin.version>
+        <!-- https://maven.apache.org/surefire/maven-surefire-plugin/ -->
+        <maven-surefire-plugin.version>3.1.0</maven-surefire-plugin.version>
+        <!-- https://www.mojohaus.org/exec-maven-plugin/ -->
+        <exec-maven-plugin.version>3.1.0</exec-maven-plugin.version>
+    </properties>
+
+    <!-- ====== Dependency Management ================================================ -->
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.kosdev.kos.sdk.bom</groupId>
+                <artifactId>kos-bom</artifactId>
+                <version>${kos.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ====== Dependencies ========================================================= -->
+
+    <dependencies>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>${hamcrest.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>${junit-jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <!-- ====== Code Repositories ==================================================== -->
+
+    <repositories>
+        <repository>
+            <id>kosdevcode</id>
+            <name>kOS Code Repository</name>
+            <url>https://maven.pkg.github.com/kosdev-code/kos-maven</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </repository>
+    </repositories>
+
+    <!-- ====== Plugin Repositories ================================================== -->
+
+    <pluginRepositories>
+        <pluginRepository>
+            <id>kosdevcode</id>
+            <name>kOS Plugin Repository</name>
+            <url>https://maven.pkg.github.com/kosdev-code/kos-maven</url>
+            <releases>
+                <enabled>true</enabled>
+                <updatePolicy>daily</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+                <updatePolicy>always</updatePolicy>
+                <checksumPolicy>fail</checksumPolicy>
+            </snapshots>
+        </pluginRepository>
+    </pluginRepositories>
+
+    <!-- ====== Build ================================================================ -->
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Clean -->
+                <!-- https://maven.apache.org/plugins/maven-clean-plugin/ -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-clean-plugin</artifactId>
+                    <version>${maven-clean-plugin.version}</version>
+                    <configuration>
+                        <filesets>
+                            <fileset>
+                                <directory>build</directory>
+                            </fileset>
+                        </filesets>
+                    </configuration>
+                </plugin>
+
+                <!-- Compiler -->
+                <!-- https://maven.apache.org/plugins/maven-compiler-plugin/index.html -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>${maven-compiler-plugin.version}</version>
+                    <configuration>
+                        <source>${maven.compiler.source}</source>
+                        <target>${maven.compiler.target}</target>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+
+                <!-- Dependency -->
+                <!-- https://maven.apache.org/plugins/maven-dependency-plugin/ -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-dependency-plugin</artifactId>
+                    <version>${maven-dependency-plugin.version}</version>
+                </plugin>
+
+                <!-- Deploy -->
+                <!-- https://maven.apache.org/plugins/maven-deploy-plugin/ -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-deploy-plugin</artifactId>
+                    <version>${maven-deploy-plugin.version}</version>
+                </plugin>
+
+            </plugins>
+        </pluginManagement>
+
+            <plugins>
+                <!-- Convert the contents of the build into a ZIP file -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-assembly-plugin</artifactId>
+                    <version>3.5.0</version>
+                    <executions>
+                        <execution>
+                            <id>make-assembly</id>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>single</goal>
+                            </goals>
+                            <configuration>
+                                <descriptors>
+                                    <descriptor>assembly.xml</descriptor>
+                                </descriptors>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+
+            <!-- Package the build output into a kab file -->
+                <!-- Convert the contents of the build into a ZIP file-->
+                <!-- Convert the ZIP file to a KAB file -->
+                <plugin>
+                    <groupId>com.kosdev.kos.maven</groupId>
+                    <artifactId>kos-kab-maven-plugin</artifactId>
+                    <executions>
+                        <execution>
+                            <phase>package</phase>
+                            <goals>
+                                <goal>kabtool</goal>
+                            </goals>
+                            <configuration>
+                                <inputType>zip</inputType>
+                                <type>kos.system</type>
+                                <copy>
+                                    <!-- Individual Files -->
+                                    <copyConfig>
+                                        <outputDir>lib</outputDir>
+                                        <include>${project.build.directory}/${project.artifactId}-${project.version}.jar</include>
+                                    </copyConfig>
+                                    <copyConfig>
+                                        <outputDir>.</outputDir>
+                                        <include>${project.basedir}/descriptor.json</include>
+                                    </copyConfig>
+
+                                    <!-- Entire Directory Contents -->
+                                    <copyConfig>
+                                        <outputDir>resources</outputDir>
+                                        <include>${project.basedir}/src/main/resources/</include>
+                                    </copyConfig>
+
+                                    <!-- Wildcard Pattern for PNG Files -->
+                                    <copyConfig>
+                                        <outputDir>images</outputDir>
+                                        <include>${project.basedir}/src/main/resources/images/*.png</include>
+                                    </copyConfig>
+
+                                    <!-- Nested Wildcard Pattern for Specific File Types -->
+                                    <copyConfig>
+                                        <outputDir>resources</outputDir>
+                                        <include>${project.basedir}/src/main/resources/**/*.txt</include>
+                                    </copyConfig>
+
+                                    <!-- Specific File Types -->
+                                    <copyConfig>
+                                        <outputDir>config</outputDir>
+                                        <include>${project.basedir}/src/main/resources/config/*.properties</include>
+                                    </copyConfig>
+
+                                    <!-- All Files in Directory (excluding directory itself) -->
+                                    <copyConfig>
+                                        <outputDir>tempContents</outputDir>
+                                        <include>${project.basedir}/src/main/resources/temp/*</include>
+                                    </copyConfig>
+
+                                    <!-- Complex Nested Directory Copying -->
+                                    <copyConfig>
+                                        <outputDir>nested</outputDir>
+                                        <include>${project.basedir}/src/main/resources/nested/</include>
+                                    </copyConfig>
+                                    <copyConfig>
+                                        <outputDir>nested/images</outputDir>
+                                        <include>${project.basedir}/src/main/resources/nested/images/</include>
+                                    </copyConfig>
+                                </copy>
+                            </configuration>
+                        </execution>
+                    </executions>
+                </plugin>
+        </plugins>
+    </build>
+
+</project>
